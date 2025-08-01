@@ -2,6 +2,7 @@ import { Request, Response, NextFunction } from 'express';
 import axios from 'axios';
 import crypto from 'crypto';
 import { VNPay, ignoreLogger, ProductCode, VnpLocale, dateFormat } from 'vnpay';
+import { JwtPayload } from '../types/express.d';
 
 import { BadRequestError } from '../core/error.response';
 import { OK } from '../core/success.response';
@@ -11,8 +12,12 @@ import RechargeUser from '../models/RechargeUser.model';
 
 import { v4 as uuidv4 } from 'uuid';
 
+interface AuthenticatedRequest extends Request {
+  user: JwtPayload;
+}
+
 class PaymentsController {
-  async payments(req: Request, res: Response): Promise<void> {
+  async payments(req: AuthenticatedRequest, res: Response): Promise<void> {
     const { id } = req.user;
     const { typePayment, amountUser } = req.body;
 
@@ -88,7 +93,6 @@ class PaymentsController {
         secureSecret: 'NXZM3DWFR0LC4R5VBK85OJZS1UE9KI6F',
         vnpayHost: 'https://sandbox.vnpayment.vn',
         testMode: true, // tùy chọn
-        hashAlgorithm: 'SHA512', // tùy chọn
         loggerFn: ignoreLogger, // tùy chọn
       });
       const uuid = uuidv4();
@@ -109,7 +113,7 @@ class PaymentsController {
     }
   }
 
-  async checkPaymentMomo(req: Request, res: Response, next: NextFunction): Promise<void> {
+  async checkPaymentMomo(req: AuthenticatedRequest, res: Response, next: NextFunction): Promise<void> {
     const { orderInfo, resultCode, amount } = req.query;
 
     if (resultCode === '0') {
@@ -118,7 +122,7 @@ class PaymentsController {
       if (findUser) {
         findUser.balance += Number(amount);
         await findUser.save();
-        const socket = (global as any).usersMap.get(findUser._id.toString());
+        const socket = (global as any).usersMap.get(String(findUser._id));
         if (socket) {
           socket.emit('new-payment', {
             userId: findUser._id,
@@ -139,7 +143,7 @@ class PaymentsController {
     }
   }
 
-  async checkPaymentVnpay(req: Request, res: Response): Promise<void> {
+  async checkPaymentVnpay(req: AuthenticatedRequest, res: Response): Promise<void> {
     const { vnp_ResponseCode, vnp_OrderInfo, vnp_Amount } = req.query;
 
     if (vnp_ResponseCode === '00') {
@@ -148,7 +152,7 @@ class PaymentsController {
       if (findUser) {
         findUser.balance += Number((vnp_Amount as string).slice(0, -2));
         await findUser.save();
-        const socket = (global as any).usersMap.get(findUser._id.toString());
+        const socket = (global as any).usersMap.get(String(findUser._id));
         if (socket) {
           socket.emit('new-payment', {
             userId: findUser._id,

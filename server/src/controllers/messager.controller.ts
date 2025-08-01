@@ -2,8 +2,13 @@ import { Request, Response } from 'express';
 import { BadRequestError } from '../core/error.response';
 import Messager from '../models/Messager.model';
 import User from '../models/users.model';
+import { JwtPayload } from '../types/express.d';
 
 import { Created, OK } from '../core/success.response';
+
+interface AuthenticatedRequest extends Request {
+  user: JwtPayload;
+}
 
 interface UserMap {
   [key: string]: {
@@ -15,7 +20,7 @@ interface UserMap {
 }
 
 class ControllerMessager {
-  async createMessage(req: Request, res: Response): Promise<void> {
+  async createMessage(req: AuthenticatedRequest, res: Response): Promise<void> {
     const { id } = req.user;
     const { receiverId, message } = req.body;
     if (!receiverId || !message) {
@@ -59,7 +64,7 @@ class ControllerMessager {
     }).send(res);
   }
 
-  async getMessages(req: Request, res: Response): Promise<void> {
+  async getMessages(req: AuthenticatedRequest, res: Response): Promise<void> {
     const { id } = req.user;
     const { receiverId } = req.query;
 
@@ -82,7 +87,7 @@ class ControllerMessager {
     }).send(res);
   }
 
-  async markMessageAsRead(req: Request, res: Response): Promise<void> {
+  async markMessageAsRead(req: AuthenticatedRequest, res: Response): Promise<void> {
     const { id } = req.user;
     const { messageId } = req.body;
 
@@ -107,7 +112,7 @@ class ControllerMessager {
     }).send(res);
   }
 
-  async markAllMessagesAsRead(req: Request, res: Response): Promise<void> {
+  async markAllMessagesAsRead(req: AuthenticatedRequest, res: Response): Promise<void> {
     const { id } = req.user;
     const { senderId } = req.body;
 
@@ -133,7 +138,7 @@ class ControllerMessager {
     }).send(res);
   }
 
-  async getMessagesByUserId(req: Request, res: Response): Promise<void> {
+  async getMessagesByUserId(req: AuthenticatedRequest, res: Response): Promise<void> {
     const { id } = req.user;
 
     // Get all messages where the current user is the receiver
@@ -155,7 +160,7 @@ class ControllerMessager {
     // Create a map of userId to user info for easy lookup
     const userMap: UserMap = {};
     users.forEach((user) => {
-      const userId = user._id.toString();
+      const userId = String(user._id);
       let statusUser = 'Đang offline';
 
       // Kiểm tra xem người dùng có đang online không
@@ -164,7 +169,7 @@ class ControllerMessager {
       }
 
       userMap[userId] = {
-        id: user._id,
+        id: String(user._id),
         username: user.fullName,
         avatar: user.avatar,
         status: statusUser,

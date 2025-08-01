@@ -2,6 +2,7 @@ import { Request, Response } from 'express';
 import Post from '../models/post.model';
 import User from '../models/users.model';
 import Favourite from '../models/favourite.model';
+import { JwtPayload } from '../types/express.d';
 
 import { OK, Created } from '../core/success.response';
 import { BadRequestError } from '../core/error.response';
@@ -9,6 +10,14 @@ import { BadRequestError } from '../core/error.response';
 // Import email utilities (keeping as require for now until we convert them)
 const SendMailApprove = require('../utils/SendMail/SendMailApprove');
 const SendMailReject = require('../utils/SendMail/SendMailReject');
+
+interface AuthenticatedRequest extends Request {
+  user: JwtPayload;
+}
+
+interface OptionallyAuthenticatedRequest extends Request {
+  user?: JwtPayload;
+}
 
 const pricePostVip = [
   { date: 3, price: 50000 },
@@ -23,7 +32,7 @@ const pricePostNormal = [
 ];
 
 class ControllerPosts {
-  async createPost(req: Request, res: Response): Promise<void> {
+  async createPost(req: AuthenticatedRequest, res: Response): Promise<void> {
     const { id } = req.user;
     const {
       title,
@@ -65,7 +74,7 @@ class ControllerPosts {
     }
 
     let pricePost = 0;
-    let postPrice = [];
+    let postPrice: { date: number; price: number } | undefined;
 
     if (typeNews === 'vip') {
       postPrice = pricePostVip.find((item) => item.date === Number(dateEnd));
@@ -192,7 +201,7 @@ class ControllerPosts {
     }).send(res);
   }
 
-  async getPostById(req: Request, res: Response): Promise<void> {
+  async getPostById(req: OptionallyAuthenticatedRequest, res: Response): Promise<void> {
     const { id } = req.query;
     if (!id) {
       throw new BadRequestError('Vui lòng cung cấp ID bài đăng');
@@ -237,7 +246,7 @@ class ControllerPosts {
     }).send(res);
   }
 
-  async getPostByUserId(req: Request, res: Response): Promise<void> {
+  async getPostByUserId(req: AuthenticatedRequest, res: Response): Promise<void> {
     const { id } = req.user;
     const dataPost = await Post.find({ userId: id }).sort({ createdAt: -1 });
     new OK({ message: 'Lấy danh sách bài đăng thành công', metadata: dataPost }).send(res);
@@ -285,7 +294,7 @@ class ControllerPosts {
     new OK({ message: 'Lấy danh sách bài đăng VIP thành công', metadata: dataPost }).send(res);
   }
 
-  async deletePost(req: Request, res: Response): Promise<void> {
+  async deletePost(req: AuthenticatedRequest, res: Response): Promise<void> {
     const { id } = req.user;
     const { postId } = req.body;
 
@@ -379,7 +388,7 @@ class ControllerPosts {
     new OK({ message: 'Từ chối bài đăng thành công' }).send(res);
   }
 
-  async postSuggest(req: Request, res: Response): Promise<void> {
+  async postSuggest(req: AuthenticatedRequest, res: Response): Promise<void> {
     const { id } = req.user;
     
     // Lấy các bài đăng mà user đã yêu thích

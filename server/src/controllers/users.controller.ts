@@ -5,6 +5,7 @@ import RechargeUser from '../models/RechargeUser.model';
 import Post from '../models/post.model';
 import KeyWordSearch from '../models/keyWordSearch.model';
 import Otp from '../models/otp.model';
+import { JwtPayload } from '../types/express.d';
 
 const sendMailForgotPassword = require('../utils/SendMail/sendMailForgotPassword');
 import { BadRequestError } from '../core/error.response';
@@ -18,6 +19,10 @@ import otpGenerator from 'otp-generator';
 import { jwtDecode } from 'jwt-decode';
 
 const { AiSearchKeyword } = require('../utils/AISearch/AISearch');
+
+interface AuthenticatedRequest extends Request {
+  user: JwtPayload;
+}
 
 class ControllerUsers {
   async register(req: Request, res: Response): Promise<void> {
@@ -46,12 +51,12 @@ class ControllerUsers {
     });
 
     // Create API key for user
-    const apiKeyData = await createApiKey(newUser._id.toString());
+    const apiKeyData = await createApiKey(String(newUser._id));
     await ApiKey.create(apiKeyData);
 
     // Generate tokens
-    const tokens = await createToken({ id: newUser._id, email: newUser.email });
-    const refreshToken = await createRefreshToken({ id: newUser._id, email: newUser.email });
+    const tokens = await createToken({ id: String(newUser._id), email: newUser.email });
+    const refreshToken = await createRefreshToken({ id: String(newUser._id), email: newUser.email });
 
     // Set refresh token cookie
     res.cookie('refreshToken', refreshToken, {
@@ -65,7 +70,7 @@ class ControllerUsers {
       message: 'Đăng ký thành công',
       metadata: {
         user: {
-          id: newUser._id,
+          id: String(newUser._id),
           fullName: newUser.fullName,
           email: newUser.email,
           phone: newUser.phone,
@@ -95,8 +100,8 @@ class ControllerUsers {
     }
 
     // Generate tokens
-    const tokens = await createToken({ id: user._id, email: user.email });
-    const refreshToken = await createRefreshToken({ id: user._id, email: user.email });
+    const tokens = await createToken({ id: String(user._id), email: user.email });
+    const refreshToken = await createRefreshToken({ id: String(user._id), email: user.email });
 
     // Set refresh token cookie
     res.cookie('refreshToken', refreshToken, {
@@ -110,7 +115,7 @@ class ControllerUsers {
       message: 'Đăng nhập thành công',
       metadata: {
         user: {
-          id: user._id,
+          id: String(user._id),
           fullName: user.fullName,
           email: user.email,
           phone: user.phone,
@@ -148,13 +153,13 @@ class ControllerUsers {
       });
 
       // Create API key for new user
-      const apiKeyData = await createApiKey(user._id.toString());
+      const apiKeyData = await createApiKey(String(user._id));
       await ApiKey.create(apiKeyData);
     }
 
     // Generate tokens
-    const tokens = await createToken({ id: user._id, email: user.email });
-    const refreshToken = await createRefreshToken({ id: user._id, email: user.email });
+    const tokens = await createToken({ id: String(user._id), email: user.email });
+    const refreshToken = await createRefreshToken({ id: String(user._id), email: user.email });
 
     // Set refresh token cookie
     res.cookie('refreshToken', refreshToken, {
@@ -168,7 +173,7 @@ class ControllerUsers {
       message: 'Đăng nhập Google thành công',
       metadata: {
         user: {
-          id: user._id,
+          id: String(user._id),
           fullName: user.fullName,
           email: user.email,
           phone: user.phone,
@@ -181,7 +186,7 @@ class ControllerUsers {
     }).send(res);
   }
 
-  async authUser(req: Request, res: Response): Promise<void> {
+  async authUser(req: AuthenticatedRequest, res: Response): Promise<void> {
     const { id } = req.user;
     const user = await User.findById(id);
     
@@ -192,7 +197,7 @@ class ControllerUsers {
     new OK({
       message: 'Xác thực thành công',
       metadata: {
-        id: user._id,
+        id: String(user._id),
         fullName: user.fullName,
         email: user.email,
         phone: user.phone,
@@ -203,7 +208,7 @@ class ControllerUsers {
     }).send(res);
   }
 
-  async logout(req: Request, res: Response): Promise<void> {
+  async logout(req: AuthenticatedRequest, res: Response): Promise<void> {
     res.clearCookie('refreshToken');
     new OK({ message: 'Đăng xuất thành công' }).send(res);
   }
@@ -224,7 +229,7 @@ class ControllerUsers {
       }
 
       // Generate new access token
-      const newAccessToken = await createToken({ id: user._id, email: user.email });
+      const newAccessToken = await createToken({ id: String(user._id), email: user.email });
 
       new OK({
         message: 'Làm mới token thành công',
@@ -235,7 +240,7 @@ class ControllerUsers {
     }
   }
 
-  async getAdminStats(req: Request, res: Response): Promise<void> {
+  async getAdminStats(req: AuthenticatedRequest, res: Response): Promise<void> {
     try {
       // Tổng số người dùng
       const totalUsers = await User.countDocuments();
@@ -313,7 +318,7 @@ class ControllerUsers {
     }
   }
 
-  async changePassword(req: Request, res: Response): Promise<void> {
+  async changePassword(req: AuthenticatedRequest, res: Response): Promise<void> {
     const { id } = req.user;
     const { oldPassword, newPassword } = req.body;
 
@@ -343,13 +348,13 @@ class ControllerUsers {
     new OK({ message: 'Đổi mật khẩu thành công' }).send(res);
   }
 
-  async getRechargeUser(req: Request, res: Response): Promise<void> {
+  async getRechargeUser(req: AuthenticatedRequest, res: Response): Promise<void> {
     const { id } = req.user;
     const rechargeHistory = await RechargeUser.find({ userId: id }).sort({ createdAt: -1 });
     new OK({ message: 'Lấy lịch sử nạp tiền thành công', metadata: rechargeHistory }).send(res);
   }
 
-  async updateUser(req: Request, res: Response): Promise<void> {
+  async updateUser(req: AuthenticatedRequest, res: Response): Promise<void> {
     const { id } = req.user;
     const updateData = req.body;
 
@@ -357,7 +362,7 @@ class ControllerUsers {
     new OK({ message: 'Cập nhật thông tin thành công', metadata: user }).send(res);
   }
 
-  async getUsers(req: Request, res: Response): Promise<void> {
+  async getUsers(req: AuthenticatedRequest, res: Response): Promise<void> {
     const dataUser = await User.find().select('-password');
     const enhancedUsers = await Promise.all(
       dataUser.map(async (user) => {
@@ -371,7 +376,7 @@ class ControllerUsers {
     new OK({ message: 'Lấy danh sách người dùng thành công', metadata: enhancedUsers }).send(res);
   }
 
-  async getRechargeStats(req: Request, res: Response): Promise<void> {
+  async getRechargeStats(req: AuthenticatedRequest, res: Response): Promise<void> {
     try {
       // Thống kê theo tháng
       const monthlyStats = await RechargeUser.aggregate([
