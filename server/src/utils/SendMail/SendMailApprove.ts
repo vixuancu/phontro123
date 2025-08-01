@@ -1,7 +1,8 @@
-const { google } = require('googleapis');
-const nodemailer = require('nodemailer');
+import { google } from 'googleapis';
+import nodemailer from 'nodemailer';
+import dotenv from 'dotenv';
 
-require('dotenv').config();
+dotenv.config();
 
 const CLIENT_ID = process.env.CLIENT_ID;
 const CLIENT_SECRET = process.env.CLIENT_SECRET;
@@ -11,7 +12,18 @@ const REFRESH_TOKEN = process.env.REFRESH_TOKEN;
 const oAuth2Client = new google.auth.OAuth2(CLIENT_ID, CLIENT_SECRET, REDIRECT_URI);
 oAuth2Client.setCredentials({ refresh_token: REFRESH_TOKEN });
 
-const SendMailApprove = async (email, post) => {
+interface Post {
+    title: string;
+    username: string;
+    location: string;
+    price: number;
+    area: number;
+    phone: string;
+    category: string;
+    typeNews: 'vip' | 'normal';
+}
+
+const SendMailApprove = async (email: string, post: Post): Promise<void> => {
     try {
         const accessToken = await oAuth2Client.getAccessToken();
         const transport = nodemailer.createTransport({
@@ -22,10 +34,11 @@ const SendMailApprove = async (email, post) => {
                 clientId: CLIENT_ID,
                 clientSecret: CLIENT_SECRET,
                 refreshToken: REFRESH_TOKEN,
-                accessToken: accessToken,
+                accessToken: accessToken.token || '',
             },
         });
-        const info = await transport.sendMail({
+        
+        await transport.sendMail({
             from: `"phongtro123" <${process.env.EMAIL_USER}>`, // sender address
             to: email, // list of receivers
             subject: 'Thông báo duyệt bài thành công', // Subject line
@@ -200,4 +213,4 @@ const SendMailApprove = async (email, post) => {
     }
 };
 
-module.exports = SendMailApprove;
+export default SendMailApprove;

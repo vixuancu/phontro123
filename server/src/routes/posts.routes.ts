@@ -1,9 +1,8 @@
-const express = require('express');
+import express from 'express';
 const router = express.Router();
 
-const { asyncHandler, authUser, authAdmin } = require('../auth/checkAuth');
-
-const controllerPosts = require('../controllers/posts.controller');
+import { asyncHandler, authUser, authAdmin } from '../auth/checkAuth';
+import controllerPosts from '../controllers/posts.controller';
 
 router.post('/api/create-post', authUser, asyncHandler(controllerPosts.createPost));
 router.get('/api/get-posts', asyncHandler(controllerPosts.getPosts));
@@ -19,4 +18,4 @@ router.post('/api/reject-post', authAdmin, asyncHandler(controllerPosts.rejectPo
 
 router.get('/api/post-suggest', authUser, asyncHandler(controllerPosts.postSuggest));
 
-module.exports = router;
+export default router;

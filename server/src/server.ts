@@ -35,11 +35,11 @@ app.use(cors({
 
 // Import modules
 import connectDB from './config/ConnectDB';
-const routes = require('./routes/index');
+import routes from './routes/index';
 import { verifyToken } from './services/tokenSevices';
-const modelMessager = require('./models/Messager.model');
-const { askQuestion } = require('./utils/Chatbot/chatbot');
-const { AiSearch } = require('./utils/AISearch/AISearch');
+import Messager from './models/Messager.model';
+import { askQuestion } from './utils/Chatbot/chatbot';
+import { AiSearch } from './utils/AISearch/AISearch';
 import socketServices from './services/socketServices';
 
 // Middleware
@@ -74,7 +74,7 @@ app.post('/chat', async (req, res) => {
 app.get('/ai-search', async (req, res) => {
     const { question } = req.query;
     console.log('question', question);
-    const data = await AiSearch(question);
+    const data = await AiSearch(question as string);
     return res.status(200).json(data);
 });
 

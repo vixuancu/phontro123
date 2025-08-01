@@ -12,7 +12,7 @@ const otpSchema = new Schema<IOtp>(
             type: String, 
             required: true 
         },
-        time: { 
+        expiresAt: { 
             type: Date, 
             default: Date.now, 
             index: { expires: 300 } // Tự động xóa sau 5 phút 

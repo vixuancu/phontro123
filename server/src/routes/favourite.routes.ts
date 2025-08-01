@@ -1,12 +1,11 @@
-const express = require('express');
+import express from 'express';
 const router = express.Router();
 
-const { asyncHandler, authUser, authAdmin } = require('../auth/checkAuth');
-
-const controllerFavourite = require('../controllers/favourite.controller');
+import { asyncHandler, authUser, authAdmin } from '../auth/checkAuth';
+import controllerFavourite from '../controllers/favourite.controller';
 
 router.post('/api/create-favourite', authUser, asyncHandler(controllerFavourite.createFavourite));
 router.post('/api/delete-favourite', authUser, asyncHandler(controllerFavourite.deleteFavourite));
 router.get('/api/get-favourite', authUser, asyncHandler(controllerFavourite.getFavourite));
 
-module.exports = router;
+export default router;

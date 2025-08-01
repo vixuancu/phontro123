@@ -1,12 +1,12 @@
-const { GoogleGenerativeAI } = require('@google/generative-ai');
+import { GoogleGenerativeAI } from '@google/generative-ai';
+import Post from '../../models/post.model';
 
 const genAI = new GoogleGenerativeAI('AIzaSyByISdNYHb8BPY-nSXARR2B30UyANF8QJw');
 const model = genAI.getGenerativeModel({ model: 'gemini-1.5-flash' });
 
-const modelPost = require('../../models/post.model');
-async function askQuestion(question) {
+async function askQuestion(question: string): Promise<string | undefined> {
     try {
-        const products = await modelPost.find({});
+        const products = await Post.find({});
         const productData = products.map((product) => `Tên ${product.title}, Giá : ${product.price}`).join('\n');
 
         const prompt = `
@@ -23,7 +23,8 @@ async function askQuestion(question) {
         return answer;
     } catch (error) {
         console.log(error);
+        return undefined;
     }
 }
 
-module.exports = { askQuestion };
+export { askQuestion };

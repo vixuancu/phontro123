@@ -17,6 +17,7 @@ export interface IUser extends BaseModel {
   isAdmin: boolean;
   isActive: boolean;
   balance: number;
+  role: 'user' | 'admin';
   typeLogin: 'email' | 'google';
 }
 
@@ -36,6 +37,7 @@ export interface IPost extends BaseModel {
   status: 'active' | 'inactive';
   typeNews: 'vip' | 'normal';
   endDate: Date;
+  isApproved: boolean;
 }
 
 // Message model interface (based on the file name)
@@ -57,7 +59,7 @@ export interface IFavourite extends BaseModel {
 export interface IOtp extends BaseModel {
   email: string;
   otp: string;
-  time: Date;
+  expiresAt: Date;
   type: 'forgotPassword' | 'verifyAccount';
 }
 

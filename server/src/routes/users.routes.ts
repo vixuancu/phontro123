@@ -1,9 +1,8 @@
-const express = require('express');
+import express from 'express';
 const router = express.Router();
 
-const { asyncHandler, authUser, authAdmin } = require('../auth/checkAuth');
-
-const controllerUsers = require('../controllers/users.controller');
+import { asyncHandler, authUser, authAdmin } from '../auth/checkAuth';
+import controllerUsers from '../controllers/users.controller';
 
 router.post('/api/register', asyncHandler(controllerUsers.register));
 router.post('/api/login', asyncHandler(controllerUsers.login));
@@ -31,4 +30,4 @@ router.get('/admin', authAdmin, (req, res) => {
     return res.status(200).json({ message: true });
 });
 
-module.exports = router;
+export default router;

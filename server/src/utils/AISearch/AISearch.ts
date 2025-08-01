@@ -1,11 +1,10 @@
-const { GoogleGenerativeAI } = require('@google/generative-ai');
+import { GoogleGenerativeAI } from '@google/generative-ai';
+import Post from '../../models/post.model';
 
 const genAI = new GoogleGenerativeAI('AIzaSyByISdNYHb8BPY-nSXARR2B30UyANF8QJw');
 const model = genAI.getGenerativeModel({ model: 'gemini-1.5-flash' });
 
-const modelPost = require('../../models/post.model');
-
-async function AiSearchKeyword(question) {
+async function AiSearchKeyword(question: string): Promise<Array<{ title: string }>> {
     try {
         const prompt = `
         Bạn là một trợ lý thông minh chuyên hỗ trợ tìm kiếm phòng trọ tại Việt Nam.
@@ -36,10 +35,10 @@ async function AiSearchKeyword(question) {
     }
 }
 
-async function AiSearch(question) {
+async function AiSearch(question: string): Promise<any[]> {
     console.log('question', question);
     try {
-        const posts = await modelPost.find({}).limit(20); // Hoặc query trước nếu có AI location
+        const posts = await Post.find({}).limit(20); // Hoặc query trước nếu có AI location
         const postData = posts.map((post) => JSON.stringify(post)).join(',\n');
 
         const prompt = `
@@ -68,4 +67,4 @@ async function AiSearch(question) {
     }
 }
 
-module.exports = { AiSearchKeyword, AiSearch };
+export { AiSearchKeyword, AiSearch };
