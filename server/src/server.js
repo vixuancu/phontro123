@@ -22,7 +22,7 @@ const cookie = require('cookie');
 app.use(cors({ origin: process.env.CLIENT_URL, credentials: true }));
 
 const connectDB = require('./config/ConnectDB');
-const routes = require('./routes/index');
+const routes = require('./routes/index.ts');
 const { verifyToken } = require('./services/tokenSevices');
 const modelMessager = require('./models/Messager.model');
 const { askQuestion } = require('./utils/Chatbot/chatbot');

@@ -26,7 +26,7 @@ interface Post {
 const SendMailApprove = async (email: string, post: Post): Promise<void> => {
     try {
         const accessToken = await oAuth2Client.getAccessToken();
-        const transport = nodemailer.createTransporter({
+        const transport = nodemailer.createTransport({
             service: 'gmail',
             auth: {
                 type: 'OAuth2',

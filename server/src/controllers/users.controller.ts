@@ -7,7 +7,7 @@ import KeyWordSearch from '../models/keyWordSearch.model';
 import Otp from '../models/otp.model';
 import { JwtPayload } from '../types/express.d';
 
-const sendMailForgotPassword = require('../utils/SendMail/sendMailForgotPassword');
+import sendMailForgotPassword from '../utils/SendMail/sendMailForgotPassword';
 import { BadRequestError } from '../core/error.response';
 import { createApiKey, createToken, createRefreshToken, verifyToken } from '../services/tokenSevices';
 import { Created, OK } from '../core/success.response';
@@ -18,7 +18,7 @@ import jwt from 'jsonwebtoken';
 import otpGenerator from 'otp-generator';
 import { jwtDecode } from 'jwt-decode';
 
-const { AiSearchKeyword } = require('../utils/AISearch/AISearch');
+import { AiSearchKeyword } from '../utils/AISearch/AISearch';
 
 interface AuthenticatedRequest extends Request {
   user: JwtPayload;

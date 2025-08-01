@@ -7,9 +7,9 @@ import { JwtPayload } from '../types/express.d';
 import { OK, Created } from '../core/success.response';
 import { BadRequestError } from '../core/error.response';
 
-// Import email utilities (keeping as require for now until we convert them)
-const SendMailApprove = require('../utils/SendMail/SendMailApprove');
-const SendMailReject = require('../utils/SendMail/SendMailReject');
+// Import email utilities
+import SendMailApprove from '../utils/SendMail/SendMailApprove';
+import SendMailReject from '../utils/SendMail/SendMailReject';
 
 interface AuthenticatedRequest extends Request {
   user: JwtPayload;
@@ -353,7 +353,7 @@ class ControllerPosts {
 
     const findUser = await User.findById(findPost.userId);
     if (findUser) {
-      SendMailApprove(findUser.email, findPost.title);
+      SendMailApprove(findUser.email, findPost);
     }
 
     new OK({ message: 'Duyệt bài đăng thành công' }).send(res);
