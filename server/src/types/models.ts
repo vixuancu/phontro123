@@ -7,7 +7,7 @@ export interface BaseModel {
   updatedAt: Date;
 }
 
-// Add specific model interfaces here as you migrate
+// thêm các interface mô hình khác tại đây
 // Example:
 // export interface User extends BaseModel {
 //   email: string;

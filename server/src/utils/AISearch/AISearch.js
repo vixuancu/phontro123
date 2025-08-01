@@ -26,9 +26,9 @@ async function AiSearchKeyword(question) {
         let text = result.response.text();
 
         // Dọn markdown nếu có
-        text = text.replace(/```json|```/g, '').trim();
+        text = text.replace(/```json|```/g, '').trim();// Xóa các ký tự markdown
 
-        const suggestions = JSON.parse(text);
+        const suggestions = JSON.parse(text);// Chuyển đổi chuỗi JSON thành mảng
         return suggestions;
     } catch (error) {
         console.log('Lỗi khi gọi Gemini hoặc parse JSON:', error);

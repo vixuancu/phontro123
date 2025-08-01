@@ -43,7 +43,7 @@ app.use((req, res, next) => {
     next();
 });
 
-global.io.on('connect', socketServices.connection);
+global.io.on('connect', socketServices.connection);// Kết nối socket
 
 app.post('/chat', async (req, res) => {
     const { question } = req.body;
