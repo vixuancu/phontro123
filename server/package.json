@@ -5,9 +5,7 @@
     "main": "index.js",
     "scripts": {
         "dev": "nodemon --exec ts-node src/server.ts",
-        "dev:js": "nodemon src/server.js",
         "build": "tsc",
-        "start": "node dist/server.js",
         "type-check": "tsc --noEmit",
         "clean": "rm -rf dist",
         "test": "echo \"Error: no test specified\" && exit 1"

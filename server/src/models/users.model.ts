@@ -52,7 +52,7 @@ const userSchema = new Schema<IUser>(
 );
 
 // Create indexes for performance
-userSchema.index({ email: 1 });
+//userSchema.index({ email: 1 }); đã dùng  unique: true,
 userSchema.index({ isActive: 1 });
 
 const User: Model<IUser> = mongoose.model<IUser>('user', userSchema);
