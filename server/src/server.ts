@@ -36,11 +36,11 @@ app.use(cors({
 // Import modules
 import connectDB from './config/ConnectDB';
 const routes = require('./routes/index');
-const { verifyToken } = require('./services/tokenSevices');
+import { verifyToken } from './services/tokenSevices';
 const modelMessager = require('./models/Messager.model');
 const { askQuestion } = require('./utils/Chatbot/chatbot');
 const { AiSearch } = require('./utils/AISearch/AISearch');
-const socketServices = require('./services/socketServices');
+import socketServices from './services/socketServices';
 
 // Middleware
 app.use(express.static(path.join(__dirname, '../src')));

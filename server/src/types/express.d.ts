@@ -5,9 +5,17 @@ import { Server } from 'socket.io';
 declare global {
   namespace Express {
     interface Request {
-      user?: any;
+      user?: JwtPayload;
       userId?: string;
       io?: Server;
     }
   }
+}
+
+// JWT payload type
+export interface JwtPayload {
+  id: string;
+  email?: string;
+  iat?: number;
+  exp?: number;
 }
