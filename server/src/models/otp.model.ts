@@ -15,7 +15,7 @@ const otpSchema = new Schema<IOtp>(
         time: { 
             type: Date, 
             default: Date.now, 
-            index: { expires: 300 } // TTL index - expires after 5 minutes (300 seconds)
+            index: { expires: 300 } // Tự động xóa sau 5 phút 
         },
         type: { 
             type: String, 

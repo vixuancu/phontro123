@@ -48,12 +48,12 @@ export const createToken = async (payload: TokenPayload): Promise<string> => {
   const findApiKey = await ApiKey.findOne({ userId: payload.id.toString() });
 
   if (!findApiKey?.privateKey) {
-    throw new Error('Private key not found for user');
+    throw new Error('Private key không tìm thấy user');
   }
 
   return jwt.sign(payload, findApiKey.privateKey, {
-    algorithm: 'RS256', // Important: Must specify algorithm when using RSA
-    expiresIn: '15m',
+    algorithm: "RS256", // Quan trọng: Phải chỉ định thuật toán khi sử dụng RSA
+    expiresIn: "15m",
   });
 };
 
@@ -61,12 +61,12 @@ export const createRefreshToken = async (payload: TokenPayload): Promise<string>
   const findApiKey = await ApiKey.findOne({ userId: payload.id.toString() });
 
   if (!findApiKey?.privateKey) {
-    throw new Error('Private key not found for user');
+    throw new Error("Private key không tìm thấy user");
   }
 
   return jwt.sign(payload, findApiKey.privateKey, {
-    algorithm: 'RS256',
-    expiresIn: '7d',
+    algorithm: "RS256",
+    expiresIn: "7d",
   });
 };
 

@@ -3,7 +3,7 @@ import { BadUserRequestError, BadUser2RequestError } from '../core/error.respons
 import { verifyToken } from '../services/tokenSevices';
 import User from '../models/users.model';
 
-// Async handler utility
+// xử lý bất đồng bộ cho các route
 export const asyncHandler = (fn: Function) => {
   return (req: Request, res: Response, next: NextFunction) => {
     Promise.resolve(fn(req, res, next)).catch(next);
@@ -11,6 +11,7 @@ export const asyncHandler = (fn: Function) => {
 };
 
 // User authentication middleware
+// Kiểm tra người dùng đã đăng nhập hay chưa
 export const authUser = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
   try {
     const token = req.cookies.token;
@@ -28,6 +29,7 @@ export const authUser = async (req: Request, res: Response, next: NextFunction):
 };
 
 // Admin authentication middleware
+// Kiểm tra người dùng có quyền admin hay không
 export const authAdmin = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
   try {
     const token = req.cookies.token;

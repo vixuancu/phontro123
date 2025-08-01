@@ -1,6 +1,6 @@
 // Express.js type extensions
-import { Request } from 'express';
-import { Server } from 'socket.io';
+import { Request } from "express";
+import { Server } from "socket.io";
 
 declare global {
   namespace Express {
@@ -16,6 +16,6 @@ declare global {
 export interface JwtPayload {
   id: string;
   email?: string;
-  iat?: number;
-  exp?: number;
+  iat?: number; // Issued at time - thời điểm bắt đầu token
+  exp?: number; // Expiration time - thời điểm hết hạn token
 }

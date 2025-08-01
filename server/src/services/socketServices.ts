@@ -25,11 +25,11 @@ class SocketServices {
       verifyToken(token)
         .then((dataDecode) => {
           if (dataDecode && dataDecode.id) {
-            // Save user info to map when connection is successful
+            // lưu thông tin người dùng vào usersMap
             usersMap.set(dataDecode.id.toString(), socket);
             console.log(`User connected: ${dataDecode.id}`);
 
-            // Handle user disconnect
+            // lắng nghe sự kiện disconnect
             socket.on('disconnect', () => {
               console.log(`User disconnected: ${dataDecode.id}`);
               usersMap.delete(dataDecode.id.toString());
@@ -49,22 +49,22 @@ class SocketServices {
     }
   }
 
-  // Utility method to get connected socket by user ID
+  // phương thức để lấy socket của người dùng theo ID
   getUserSocket(userId: string): Socket | undefined {
     return usersMap.get(userId);
   }
 
-  // Utility method to check if user is online
+  // phương thức để kiểm tra xem người dùng có đang trực tuyến hay không
   isUserOnline(userId: string): boolean {
     return usersMap.has(userId);
   }
 
-  // Utility method to get all connected users
+  // phương thức để lấy tất cả người dùng đang kết nối
   getConnectedUsers(): string[] {
     return Array.from(usersMap.keys());
   }
 
-  // Utility method to send message to specific user
+  // phương thức để gửi tin nhắn đến người dùng cụ thể
   sendToUser(userId: string, event: string, data: any): boolean {
     const socket = usersMap.get(userId);
     if (socket) {
